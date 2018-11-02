@@ -1,0 +1,7 @@
+.idea/
+venvv
+venv
+ven
+*.pyc 
+*__pycache__/*
+*__pycache__*
