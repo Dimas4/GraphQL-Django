@@ -1,4 +1,5 @@
 import graphene
+import copy
 
 from graphene_django.types import DjangoObjectType
 
@@ -87,9 +88,75 @@ class CreateArticle(graphene.Mutation):
         return CreateArticle(article=article)
 
 
+class DeleteCategory(graphene.Mutation):
+    class Arguments:
+        id = graphene.Int()
+
+    category = graphene.Field(CategoryType)
+
+    def mutate(self, info, id=None):
+        category = Category.objects.get(id=id)
+        obj = copy.copy(category)
+        category.delete()
+        return DeleteCategory(category=obj)
+
+
+class DeleteArticle(graphene.Mutation):
+    class Arguments:
+        id = graphene.Int()
+
+    article = graphene.Field(ArticleType)
+
+    def mutate(self, info, id=None):
+        article = Article.objects.get(id=id)
+        obj = copy.copy(article)
+        article.delete()
+        return DeleteArticle(article=obj)
+
+
+class UpdateCategory(graphene.Mutation):
+    class Arguments:
+        id = graphene.Int()
+        name = graphene.String()
+
+    category = graphene.Field(CategoryType)
+
+    def mutate(self, info, id=None, name=None):
+        category = Category.objects.get(id=id)
+        category.name = name
+        category.save()
+        return UpdateCategory(category=category)
+
+
+class UpdateArticle(graphene.Mutation):
+    class Arguments:
+        id = graphene.Int()
+        title = graphene.String()
+        content = graphene.String()
+        category_id = graphene.Int()
+
+    article = graphene.Field(ArticleType)
+
+    def mutate(self, info, id=None, title=None, content=None, category_id=None):
+        article = Article.objects.get(id=id)
+        if title:
+            article.title = title
+        if content:
+            article.content = content
+        if category_id:
+            article.category = Category.objects.get(id=category_id)
+        article.save()
+
+        return UpdateArticle(article=article)
+
+
 class Mutation(graphene.ObjectType):
     create_category = CreateCategory.Field()
     create_article = CreateArticle.Field()
+    delete_category = DeleteCategory.Field()
+    delete_article = DeleteArticle.Field()
+    update_category = UpdateCategory.Field()
+    update_article = UpdateArticle.Field()
 
 
 """
